@@ -26,7 +26,6 @@ public abstract class OnlineAlgorithm {
         int[] arrivalOrder = new int[g.getM()];
         for(int i = 0; i < arrivalOrder.length; ++i) arrivalOrder[i] = i; 
         // Implementing Fisher–Yates shuffle
-        Random r = new Random();
         for (int i = arrivalOrder.length - 1; i > 0; --i) {
             int index = r.nextInt(i + 1);
             int a = arrivalOrder[index];

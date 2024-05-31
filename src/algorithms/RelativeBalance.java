@@ -32,7 +32,7 @@ public class RelativeBalance extends OnlineAlgorithm {
         Vertex partner = null; 
         for(Vertex u : availableNeighbors) {
             // Definition of RelativeBalance https://drops.dagstuhl.de/storage/00lipics/lipics-vol207-approx-random2021/LIPIcs.APPROX-RANDOM.2021.2/LIPIcs.APPROX-RANDOM.2021.2.pdf
-            // Note that RelativeBalance ignores weights
+            // Todo: add vertex weights for consideration
             double relLoad = 1.0*loads[u.getId()]/g.getCapacity(u.getId());
             if(relLoad < min) {
                 min = relLoad; 
