@@ -16,7 +16,7 @@ public class RelativeBalance extends OnlineAlgorithm {
         for(int v : arrivalOrder) {
             Set<Vertex> availableNeighbors = getAvailableNeighbors(g.getOnlineVertex(v), loads, g);
             if(!availableNeighbors.isEmpty()) {
-                Vertex partner = chooseVertex(g.getOnlineVertex(v), availableNeighbors, loads, g);
+                Vertex partner = chooseVertex(availableNeighbors, loads, g);
                 //match only succeeds with the probability of the given edge
                 if(r.nextDouble() < g.getOnlineVertex(v).getEdge(partner).getProbability()) {
                     m.match(partner.getId(), v);
@@ -27,7 +27,7 @@ public class RelativeBalance extends OnlineAlgorithm {
         return m; 
     }
 
-    private Vertex chooseVertex(Vertex v, Set<Vertex> availableNeighbors, int[] loads, BipartiteGraph g) {
+    private Vertex chooseVertex(Set<Vertex> availableNeighbors, int[] loads, BipartiteGraph g) {
         double min = 1; 
         Vertex partner = null; 
         for(Vertex u : availableNeighbors) {
