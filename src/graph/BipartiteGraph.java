@@ -43,6 +43,14 @@ public class BipartiteGraph {
         return onlineVertices[v];
     }
 
+    public int getN() {
+        return offlineVertices.length; 
+    }
+
+    public int getM() {
+        return onlineVertices.length;
+    }
+
     @Override
     public String toString() {
         StringBuilder output = new StringBuilder(); 

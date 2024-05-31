@@ -1,5 +1,6 @@
 package src;
 
+import src.algorithms.Ranking;
 import src.graph.*;
 
 class App {
@@ -10,5 +11,7 @@ class App {
         g.addEdge(0, 1, e);
         g.addEdge(1, 1, e);
         System.out.println(g); 
+        Ranking algo = new Ranking();
+        System.out.println(algo.executeAlgorithm(g));
     }
 }
