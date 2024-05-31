@@ -19,7 +19,7 @@ public class Matching {
     public void match(int u, int v) {
         assignment[v] = u; 
         ++size; 
-        weight += g.getOfflineVertex(u).getEdge(g.getOnlineVertex(u)).getWeight();
+        weight += g.getOfflineVertex(u).getEdge(g.getOnlineVertex(v)).getWeight();
     }
 
     public int getSize() {
