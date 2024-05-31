@@ -4,19 +4,19 @@ import java.util.*;
 import src.graph.*;
 
 /**
- * Represents the Ranking Algorithm and its generalization Perturbed-Greedy
+ * Represents the RelativeBalance Algorithm
  */
-public class Ranking extends OnlineAlgorithm {
+public class RelativeBalance extends OnlineAlgorithm {
+
     @Override
     public Matching executeAlgorithm(BipartiteGraph g, int[] arrivalOrder) {
         Matching m = new Matching(g);
         int n = g.getN();
-        double[] ranks = r.doubles(n).toArray(); 
         int[] loads = new int[n];
         for(int v : arrivalOrder) {
             Set<Vertex> availableNeighbors = getAvailableNeighbors(g.getOnlineVertex(v), loads, g);
             if(!availableNeighbors.isEmpty()) {
-                Vertex partner = chooseVertex(g.getOnlineVertex(v), availableNeighbors, ranks);
+                Vertex partner = chooseVertex(g.getOnlineVertex(v), availableNeighbors, loads, g);
                 //match only succeeds with the probability of the given edge
                 if(r.nextDouble() < g.getOnlineVertex(v).getEdge(partner).getProbability()) {
                     m.match(partner.getId(), v);
@@ -27,22 +27,19 @@ public class Ranking extends OnlineAlgorithm {
         return m; 
     }
 
-    private Vertex chooseVertex(Vertex v, Set<Vertex> availableNeighbors, double[] ranks) {
-        double max = 0; 
+    private Vertex chooseVertex(Vertex v, Set<Vertex> availableNeighbors, int[] loads, BipartiteGraph g) {
+        double min = 1; 
         Vertex partner = null; 
         for(Vertex u : availableNeighbors) {
-            // Definition of Perturbed-Greedy https://drops.dagstuhl.de/storage/00lipics/lipics-vol207-approx-random2021/LIPIcs.APPROX-RANDOM.2021.2/LIPIcs.APPROX-RANDOM.2021.2.pdf
-            double offer = v.getEdge(u).getWeight() * (1-f(ranks[u.getId()]));
-            if(offer > max) {
-                max = offer; 
+            // Definition of RelativeBalance https://drops.dagstuhl.de/storage/00lipics/lipics-vol207-approx-random2021/LIPIcs.APPROX-RANDOM.2021.2/LIPIcs.APPROX-RANDOM.2021.2.pdf
+            // Note that RelativeBalance ignores weights
+            double relLoad = 1.0*loads[u.getId()]/g.getCapacity(u.getId());
+            if(relLoad < min) {
+                min = relLoad; 
                 partner = u; 
             }
         }
         return partner;
     }
-
-    // computes f(x) := e^(x-1); 
-    private double f(double x) {
-        return Math.exp(x-1);
-    }
 }
+
