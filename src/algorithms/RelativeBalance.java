@@ -13,15 +13,11 @@ public class RelativeBalance extends OnlineAlgorithm {
         Matching m = new Matching(g);
         int n = g.getN();
         int[] loads = new int[n];
-        for(int v : arrivalOrder) {
-            Set<Vertex> availableNeighbors = getAvailableNeighbors(g.getOnlineVertex(v), loads, g);
+        for(int on : arrivalOrder) {
+            Set<Vertex> availableNeighbors = getAvailableNeighbors(g.getOnlineVertex(on), loads, g);
             if(!availableNeighbors.isEmpty()) {
                 Vertex partner = chooseVertex(availableNeighbors, loads, g);
-                //match only succeeds with the probability of the given edge
-                if(r.nextDouble() < g.getOnlineVertex(v).getEdge(partner).getProbability()) {
-                    m.match(partner.getId(), v);
-                    ++loads[partner.getId()];
-                }
+                match(partner, g.getOnlineVertex(on), loads, m);
             }
         }
         return m; 
@@ -30,13 +26,13 @@ public class RelativeBalance extends OnlineAlgorithm {
     private Vertex chooseVertex(Set<Vertex> availableNeighbors, int[] loads, BipartiteGraph g) {
         double min = 1; 
         Vertex partner = null; 
-        for(Vertex u : availableNeighbors) {
+        for(Vertex off : availableNeighbors) {
             // Definition of RelativeBalance https://drops.dagstuhl.de/storage/00lipics/lipics-vol207-approx-random2021/LIPIcs.APPROX-RANDOM.2021.2/LIPIcs.APPROX-RANDOM.2021.2.pdf
             // Todo: add vertex weights for consideration
-            double relLoad = 1.0*loads[u.getId()]/g.getCapacity(u.getId());
+            double relLoad = 1.0*loads[off.getId()]/g.getCapacity(off.getId());
             if(relLoad < min) {
                 min = relLoad; 
-                partner = u; 
+                partner = off; 
             }
         }
         return partner;

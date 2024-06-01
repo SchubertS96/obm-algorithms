@@ -13,29 +13,25 @@ public class Ranking extends OnlineAlgorithm {
         int n = g.getN();
         double[] ranks = r.doubles(n).toArray(); 
         int[] loads = new int[n];
-        for(int v : arrivalOrder) {
-            Set<Vertex> availableNeighbors = getAvailableNeighbors(g.getOnlineVertex(v), loads, g);
+        for(int on : arrivalOrder) {
+            Set<Vertex> availableNeighbors = getAvailableNeighbors(g.getOnlineVertex(on), loads, g);
             if(!availableNeighbors.isEmpty()) {
-                Vertex partner = chooseVertex(g.getOnlineVertex(v), availableNeighbors, ranks);
-                //match only succeeds with the probability of the given edge
-                if(r.nextDouble() < g.getOnlineVertex(v).getEdge(partner).getProbability()) {
-                    m.match(partner.getId(), v);
-                    ++loads[partner.getId()];
-                }
+                Vertex partner = chooseVertex(g.getOnlineVertex(on), availableNeighbors, ranks);
+                match(partner, g.getOnlineVertex(on), loads, m);
             }
         }
         return m; 
     }
 
-    private Vertex chooseVertex(Vertex v, Set<Vertex> availableNeighbors, double[] ranks) {
+    private Vertex chooseVertex(Vertex on, Set<Vertex> availableNeighbors, double[] ranks) {
         double max = 0; 
         Vertex partner = null; 
-        for(Vertex u : availableNeighbors) {
+        for(Vertex off : availableNeighbors) {
             // Definition of Perturbed-Greedy https://drops.dagstuhl.de/storage/00lipics/lipics-vol207-approx-random2021/LIPIcs.APPROX-RANDOM.2021.2/LIPIcs.APPROX-RANDOM.2021.2.pdf
-            double offer = v.getEdge(u).getWeight() * (1-f(ranks[u.getId()]));
+            double offer = off.getEdge(on).getWeight() * (1-f(ranks[off.getId()]));
             if(offer > max) {
                 max = offer; 
-                partner = u; 
+                partner = off; 
             }
         }
         return partner;

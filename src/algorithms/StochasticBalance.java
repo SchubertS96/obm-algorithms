@@ -1,10 +1,7 @@
 package src.algorithms;
 
 import java.util.Set;
-
-import src.graph.BipartiteGraph;
-import src.graph.Matching;
-import src.graph.Vertex;
+import src.graph.*;
 
 /**
  * Represents the StochasticBalance Algorithm
@@ -17,33 +14,30 @@ public class StochasticBalance extends OnlineAlgorithm {
         int n = g.getN();
         int[] loads = new int[n];
         double[] stochLoads = new double[n];
-        for(int v : arrivalOrder) {
-            Set<Vertex> availableNeighbors = getAvailableNeighbors(g.getOnlineVertex(v), loads, g);
+        for(int on : arrivalOrder) {
+            Set<Vertex> availableNeighbors = getAvailableNeighbors(g.getOnlineVertex(on), loads, g);
             if(!availableNeighbors.isEmpty()) {
-                Vertex partner = chooseVertex(g.getOnlineVertex(v), availableNeighbors, stochLoads, g);
-                stochLoads[partner.getId()] += partner.getEdge(g.getOnlineVertex(v)).getProbability();
-                //match only succeeds with the probability of the given edge
-                if(r.nextDouble() < g.getOnlineVertex(v).getEdge(partner).getProbability()) {
-                    m.match(partner.getId(), v);
-                    ++loads[partner.getId()];
-                }
+                Vertex partner = chooseVertex(g.getOnlineVertex(on), availableNeighbors, stochLoads, g);
+                stochLoads[partner.getId()] += partner.getEdge(g.getOnlineVertex(on)).getProbability();
+                match(partner, g.getOnlineVertex(on), loads, m);
             }
         }
         return m; 
     }
 
-    private Vertex chooseVertex(Vertex v, Set<Vertex> availableNeighbors, double[] stochLoads, BipartiteGraph g) {
+    private Vertex chooseVertex(Vertex on, Set<Vertex> availableNeighbors, double[] stochLoads, BipartiteGraph g) {
         double max = 0; 
         Vertex partner = null; 
-        for(Vertex u : availableNeighbors) {
+        for(Vertex off : availableNeighbors) {
             // Definition of generalized StochasticBalance (Todo: cite new Approx Paper)
-            double weight = v.getEdge(u).getWeight();
-            double probability = v.getEdge(u).getProbability();
-            double l = stochLoads[u.getId()]/g.getCapacity(u.getId());
-            double offer = weight*probability*(1-f(l)); 
+            Edge e = off.getEdge(on);
+            double w = e.getWeight();
+            double p = e.getProbability();
+            double l = stochLoads[off.getId()]/g.getCapacity(off.getId());
+            double offer = w*p*(1-f(l)); 
             if(offer > max) {
                 max = offer; 
-                partner = u; 
+                partner = off; 
             }
         }
         return partner;

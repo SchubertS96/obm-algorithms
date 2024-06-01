@@ -28,9 +28,9 @@ public abstract class OnlineAlgorithm {
         // Implementing Fisher–Yates shuffle
         for (int i = arrivalOrder.length - 1; i > 0; --i) {
             int index = r.nextInt(i + 1);
-            int a = arrivalOrder[index];
+            int temp = arrivalOrder[index];
             arrivalOrder[index] = arrivalOrder[i];
-            arrivalOrder[i] = a;
+            arrivalOrder[i] = temp;
         }
         return executeAlgorithm(g, arrivalOrder);
     }
@@ -42,15 +42,23 @@ public abstract class OnlineAlgorithm {
      */
     public abstract Matching executeAlgorithm(BipartiteGraph g, int[] arrivalOrder);
 
-    Set<Vertex> getAvailableNeighbors(Vertex v, int[] loads, BipartiteGraph g) {
-        Set<Vertex> neighbors = v.getNeighbors();
+    Set<Vertex> getAvailableNeighbors(Vertex on, int[] loads, BipartiteGraph g) {
+        Set<Vertex> neighbors = on.getNeighbors();
         for (Iterator<Vertex> i = neighbors.iterator(); i.hasNext();) {
-            Vertex u = i.next();
-            int uid = u.getId();
-            if(loads[uid] == g.getCapacity(uid)) {
+            Vertex off = i.next();
+            int offId = off.getId();
+            if(loads[offId] == g.getCapacity(offId)) {
                 i.remove();
             }
         }
         return neighbors;
+    }
+
+    void match(Vertex off, Vertex on, int[] loads, Matching m) {
+        //match only succeeds with the probability of the given edge
+        if(r.nextDouble() < off.getEdge(on).getProbability()) {
+            m.match(off.getId(), on.getId());
+            ++loads[off.getId()];
+        }
     }
 }
