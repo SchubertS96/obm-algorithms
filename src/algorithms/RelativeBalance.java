@@ -13,29 +13,37 @@ public class RelativeBalance extends OnlineAlgorithm {
         Matching m = new Matching(g);
         int n = g.getN();
         int[] loads = new int[n];
-        for(int on : arrivalOrder) {
-            Set<Vertex> availableNeighbors = getAvailableNeighbors(g.getOnlineVertex(on), loads, g);
+        for(int onId : arrivalOrder) {
+            Vertex on = g.getOnlineVertex(onId);
+            Set<Vertex> availableNeighbors = getAvailableNeighbors(on, loads, g);
             if(!availableNeighbors.isEmpty()) {
-                Vertex partner = chooseVertex(availableNeighbors, loads, g);
-                match(partner, g.getOnlineVertex(on), loads, m);
+                Vertex partner = chooseVertex(on, availableNeighbors, loads, g);
+                match(partner, on, loads, m);
             }
         }
         return m; 
     }
 
-    private Vertex chooseVertex(Set<Vertex> availableNeighbors, int[] loads, BipartiteGraph g) {
-        double min = 1; 
+    private Vertex chooseVertex(Vertex on, Set<Vertex> availableNeighbors, int[] loads, BipartiteGraph g) {
+        double max = 0; 
         Vertex partner = null; 
         for(Vertex off : availableNeighbors) {
             // Definition of RelativeBalance https://drops.dagstuhl.de/storage/00lipics/lipics-vol207-approx-random2021/LIPIcs.APPROX-RANDOM.2021.2/LIPIcs.APPROX-RANDOM.2021.2.pdf
-            // Todo: add vertex weights for consideration
-            double relLoad = 1.0*loads[off.getId()]/g.getCapacity(off.getId());
-            if(relLoad < min) {
-                min = relLoad; 
+            int b = g.getCapacity(off.getId());
+            double relLoad = 1.0*loads[off.getId()]/b;
+            double w = on.getEdge(off).getWeight();
+            double offer = w*(1-f(b, relLoad));
+            if(offer > max) {
+                max = offer; 
                 partner = off; 
             }
         }
         return partner;
+    }
+
+    // computes f(b, l) := (1+1/b)^(b*(l-1)); 
+    private double f(int b, double l) {
+        return Math.pow(1+1.0/b, b*(l-1));
     }
 }
 
