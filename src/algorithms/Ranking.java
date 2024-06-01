@@ -13,11 +13,12 @@ public class Ranking extends OnlineAlgorithm {
         int n = g.getN();
         double[] ranks = r.doubles(n).toArray(); 
         int[] loads = new int[n];
-        for(int on : arrivalOrder) {
-            Set<Vertex> availableNeighbors = getAvailableNeighbors(g.getOnlineVertex(on), loads, g);
+        for(int onId : arrivalOrder) {
+            Vertex on = g.getOnlineVertex(onId);
+            Set<Vertex> availableNeighbors = getAvailableNeighbors(on, loads, g);
             if(!availableNeighbors.isEmpty()) {
-                Vertex partner = chooseVertex(g.getOnlineVertex(on), availableNeighbors, ranks);
-                match(partner, g.getOnlineVertex(on), loads, m);
+                Vertex partner = chooseVertex(on, availableNeighbors, ranks);
+                match(partner, on, loads, m);
             }
         }
         return m; 

@@ -14,12 +14,13 @@ public class StochasticBalance extends OnlineAlgorithm {
         int n = g.getN();
         int[] loads = new int[n];
         double[] stochLoads = new double[n];
-        for(int on : arrivalOrder) {
-            Set<Vertex> availableNeighbors = getAvailableNeighbors(g.getOnlineVertex(on), loads, g);
+        for(int onId : arrivalOrder) {
+            Vertex on = g.getOnlineVertex(onId);
+            Set<Vertex> availableNeighbors = getAvailableNeighbors(on, loads, g);
             if(!availableNeighbors.isEmpty()) {
-                Vertex partner = chooseVertex(g.getOnlineVertex(on), availableNeighbors, stochLoads, g);
-                stochLoads[partner.getId()] += partner.getEdge(g.getOnlineVertex(on)).getProbability();
-                match(partner, g.getOnlineVertex(on), loads, m);
+                Vertex partner = chooseVertex(on, availableNeighbors, stochLoads, g);
+                stochLoads[partner.getId()] += partner.getEdge(on).getProbability();
+                match(partner, on, loads, m);
             }
         }
         return m; 
