@@ -32,7 +32,7 @@ public class StochasticBalance extends OnlineAlgorithm {
         for(Vertex off : availableNeighbors) {
             // Definition of generalized StochasticBalance (Todo: cite new Approx Paper)
             Edge e = off.getEdge(on);
-            double w = e.getWeight();
+            int w = e.getWeight();
             double p = e.getProbability();
             double l = stochLoads[off.getId()]/g.getCapacity(off.getId());
             double offer = w*p*(1-f(l)); 

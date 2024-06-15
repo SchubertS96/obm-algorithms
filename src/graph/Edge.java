@@ -1,22 +1,23 @@
 package src.graph;
 
 public class Edge {
-    double weight, probability; 
+    double probability; 
+    int weight;
 
-    public Edge(double weight, double probability) {
+    public Edge(int weight, double probability) {
         this.weight = weight; 
         this.probability = probability; 
     }
 
     public Edge() {
-        this(1.0, 1.0); 
+        this(1, 1); 
     }
 
-    public void setWeight(double weight) {
+    public void setWeight(int weight) {
         this.weight = weight; 
     }
 
-    public double getWeight() {
+    public int getWeight() {
         return weight; 
     }
 
