@@ -31,7 +31,7 @@ public class RelativeBalance extends OnlineAlgorithm {
             // Definition of RelativeBalance https://drops.dagstuhl.de/storage/00lipics/lipics-vol207-approx-random2021/LIPIcs.APPROX-RANDOM.2021.2/LIPIcs.APPROX-RANDOM.2021.2.pdf
             int b = g.getCapacity(off.getId());
             double relLoad = 1.0*loads[off.getId()]/b;
-            double w = on.getEdge(off).getWeight();
+            int w = on.getEdge(off).getWeight();
             double offer = w*(1-f(b, relLoad));
             if(offer > max) {
                 max = offer; 
