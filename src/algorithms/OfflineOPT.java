@@ -81,7 +81,8 @@ public class OfflineOPT extends OfflineAlgorithm {
 
         Vertex[] vertices;
         List<Edge> edges; 
-        int flow, cost; 
+        //int flow; 
+        int cost; 
         int s, t; 
         int[] levels; 
 
@@ -90,7 +91,8 @@ public class OfflineOPT extends OfflineAlgorithm {
             edges = new ArrayList<>();
             for(int i = 0; i < V; ++i) vertices[i] = new Vertex();
             levels = new int[V];
-            flow = 0; cost = 0; s = V-2; t = V-1;
+            //flow = 0; 
+            cost = 0; s = V-2; t = V-1;
         }
 
         /**
@@ -138,7 +140,7 @@ public class OfflineOPT extends OfflineAlgorithm {
                 while(true) {
                     int addedFlow = sendFlow(s, Integer.MAX_VALUE, start);
                     if(addedFlow == 0) break; 
-                    flow += addedFlow; 
+                    //flow += addedFlow; 
                 }
             }
         }

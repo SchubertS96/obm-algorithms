@@ -1,5 +1,9 @@
 package src.graph;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
 public class BipartiteGraph {
     Vertex[] offlineVertices, onlineVertices;
     int[] capacities;  
@@ -72,5 +76,44 @@ public class BipartiteGraph {
         return output.toString();
     }
 
+    /**
+     * Creates a BipartiteGraph that is given by an input file. Each line must contain exactly two integers seperated by whitespace. 
+     * First line has to contain the number of offline (n) and online (m) nodes.
+     * Next n lines have to contain vertex capacity and weight of all offline nodes.
+     * Remaining lines contain all the edges. Each line contains one edge by specifying the endpoints. 
+     */
+    public static BipartiteGraph createFromFile(String fileName) {
+        File input = new File(fileName);
+        Scanner scanner;
+        try {
+            scanner = new Scanner(input);
+            String line = scanner.nextLine();
+            String[] lineArr = line.split("\\s+");
+            int N = Integer.parseInt(lineArr[0]), M = Integer.parseInt(lineArr[1]);
+            BipartiteGraph g = new BipartiteGraph(N, M);
+            int[] weights = new int[N];
+            // read node info
+            for(int u = 0; u < N; ++u) {
+                line = scanner.nextLine();
+                lineArr = line.split("\\s+");
+                int b = Integer.parseInt(lineArr[0]), w = Integer.parseInt(lineArr[1]);
+                g.setCapacity(u, b);
+                weights[u] = w; 
+            }
+            // read edges
+            while(scanner.hasNextLine()) {
+                line = scanner.nextLine();
+                lineArr = line.split("\\s+");
+                int u = Integer.parseInt(lineArr[0]), v = Integer.parseInt(lineArr[1]);
+                Edge e = new Edge(weights[u], 1);
+                g.addEdge(u, v, e);
+            }
+            scanner.close();
+            return g; 
+        } catch (FileNotFoundException e) {
+            System.err.println("File "+fileName+" not found");
+        }
+        return null;
+    }
    // Todo: public static BipartiteGraph createFromFile()
 }
