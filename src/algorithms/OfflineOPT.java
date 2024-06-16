@@ -5,8 +5,8 @@ import src.graph.BipartiteGraph;
 import src.graph.Matching;
 
 /**
- * Computes the offline optimal solution by computing the max cost max flow 
- * Note that this is only correct for vertex-weighted input graphs
+ * Computes the offline optimal solution by computing the max cost max flow using a cycle-cancelling algorithm.
+ * Note that this is only correct for vertex-weighted input graphs.
  */
 public class OfflineOPT extends OfflineAlgorithm {
     @Override
@@ -14,18 +14,55 @@ public class OfflineOPT extends OfflineAlgorithm {
         ResidualGraph res = new ResidualGraph(g.getN()+g.getM()+2);
         res.buildGraph(g);
         res.computeDincMaxFlow();
-        System.out.println("Max flow is: "+res.flow);
-        return new Matching(g);
+        ResidualGraph.Edge[] parent = new ResidualGraph.Edge[res.vertices.length];
+        while(true) {
+            int node = res.findPositiveCycle(parent);
+            if(node == -1) break;
+            // identify max flow that can be sent through the cycle
+            int possibleFlow = Integer.MAX_VALUE;
+            int cur = node; 
+            do {
+                ResidualGraph.Edge e = parent[cur];
+                possibleFlow = Math.min(possibleFlow, e.capacity-e.flow);
+                cur = e.from;
+            } while(cur != node);
+            // send flow through cycle
+            do { 
+                ResidualGraph.Edge e = parent[cur];
+                e.flow += possibleFlow;
+                e.reverse.flow -= possibleFlow;
+                res.cost += possibleFlow*e.cost;
+                cur = e.from;
+            } while (cur != node);
+        }
+        System.out.println("Cost is: "+res.cost);
+        return constructMatching(g, res);
+    }
+
+    /**
+     * Creates a matching for the original bipartite graph after computing the max cost max flow with a residual graph
+     */
+    private Matching constructMatching(BipartiteGraph g, ResidualGraph res) {
+        Matching m = new Matching(g);
+        for(int u = 0; u < g.getN(); ++u) {
+            for(ResidualGraph.Edge e : res.vertices[u].adj) {
+                if(e.flow > 0) {
+                    m.match(u, e.to-g.getN());
+                }
+            }
+        }
+        return m; 
     }
 
     class ResidualGraph {
         class Edge {
             int capacity, flow, cost; 
-            int to; 
+            int from, to; 
 
             Edge reverse; 
 
-            Edge(int to, int capacity, int flow, int cost) {
+            Edge(int from, int to, int capacity, int flow, int cost) {
+                this.from = from; 
                 this.to = to; 
                 this.capacity = capacity; 
                 this.flow = flow; 
@@ -43,19 +80,21 @@ public class OfflineOPT extends OfflineAlgorithm {
         }
 
         Vertex[] vertices;
+        List<Edge> edges; 
         int flow, cost; 
         int s, t; 
         int[] levels; 
 
         public ResidualGraph(int V) {
             vertices = new Vertex[V];
+            edges = new ArrayList<>();
             for(int i = 0; i < V; ++i) vertices[i] = new Vertex();
             levels = new int[V];
             flow = 0; cost = 0; s = V-2; t = V-1;
         }
 
         /**
-         * Constructs the initial flow network used to compute the max cost max vlow
+         * Constructs the initial flow network used to compute the max cost max flow.
          * @param g     the input bipartite graph
          */
         void buildGraph(BipartiteGraph g) {
@@ -73,15 +112,25 @@ public class OfflineOPT extends OfflineAlgorithm {
             }
         }
 
+        /**
+         * Adds a directed edge to the residual graph. 
+         */
         void addEdge(int from, int to, int capacity, int cost) {
-            Edge one = new Edge(to, capacity,0, cost);
-            Edge two = new Edge(from, 0, 0, cost);
+            Edge one = new Edge(from, to, capacity,0, cost);
+            Edge two = new Edge(to, from, 0, 0, -cost);
             one.reverse = two; 
             two.reverse = one; 
             vertices[from].adj.add(one);
             vertices[to].adj.add(two);
+            edges.add(one);
+            edges.add(two); 
         }
 
+        /**
+         * Computes the maximum flow in the flow network using Dinc's Algorithm.
+         * If the residual graph was built from a bipartite graph, this essentially computes a 
+         * maximum cardinality matching.
+         */
         void computeDincMaxFlow() {
             while(bfs()) {
                 int[] start = new int[vertices.length];
@@ -94,6 +143,10 @@ public class OfflineOPT extends OfflineAlgorithm {
             }
         }
 
+        /**
+         * Helper method used in Dinc's max flow algorithm. As much flow as possible is sent from "from" to t, when from receives "inFlow".
+         * start contains the indices of the edges that are yet to be discovered in each adjacency list. 
+         */
         int sendFlow(int from, int inFlow, int[] start) {
             if(from == t) return inFlow; 
 
@@ -105,6 +158,7 @@ public class OfflineOPT extends OfflineAlgorithm {
                     if(addFlow > 0) {
                         e.flow += addFlow;
                         e.reverse.flow -= addFlow;
+                        cost += addFlow*e.cost;
                         return addFlow;
                     }
                 }
@@ -114,7 +168,7 @@ public class OfflineOPT extends OfflineAlgorithm {
         }
 
         /**
-         * Starts a BFS from the source s and assigns levels to each
+         * Starts a BFS from the source s and assigns levels to each.
          * @return  true if there is a path from s to t
          */
         boolean bfs() {
@@ -137,6 +191,36 @@ public class OfflineOPT extends OfflineAlgorithm {
                 }
             }
             return levels[t] > 0; 
+        }
+
+        /**
+         * Identifies a positive cycle (w.r.t. the costs) if there is one in the residual graph. 
+         * Similar to the Bellman-Ford-Algorithm from the sink t, but here the longest path is identified.
+         * @param parent:   Array for storing the edge from parent, i.e. the predecessor, on the shortest path from t to each node.
+         * @return          -1 if there is no positive cycle, otherwise node id of a node on the cycle is returned.
+         */
+        int findPositiveCycle(Edge[] parent) {
+            int V = vertices.length;
+            int[] dist = new int[V];
+            int update = -1; 
+            Arrays.fill(dist, Integer.MIN_VALUE);
+            dist[t] = 0; 
+            for(int i = 0; i < V; ++i) {
+                update = -1; 
+                for(Edge e : edges) {
+                    if(e.flow < e.capacity && dist[e.from] > Integer.MIN_VALUE && dist[e.from] + e.cost > dist[e.to]) {
+                        dist[e.to] = dist[e.from] + e.cost;
+                        parent[e.to] = e;
+                        update = e.to;
+                    }
+                }
+            }
+            if(update == -1) return -1; 
+            // make sure that node is on cycle
+            for(int i = 0; i < V; ++i) {
+                update = parent[update].from;
+            }
+            return update; 
         }
     }
 }
