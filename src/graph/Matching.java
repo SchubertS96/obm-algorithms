@@ -6,7 +6,7 @@ public class Matching {
     BipartiteGraph g; 
     int[] assignment; 
     int size; 
-    double weight; 
+    int weight; 
 
     public Matching(BipartiteGraph g) {
         this.g = g; 

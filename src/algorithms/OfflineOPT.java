@@ -14,6 +14,7 @@ public class OfflineOPT extends OfflineAlgorithm {
         ResidualGraph res = new ResidualGraph(g.getN()+g.getM()+2);
         res.buildGraph(g);
         res.computeDincMaxFlow();
+        System.out.println("Max flow is: "+res.flow);
         return new Matching(g);
     }
 
@@ -66,7 +67,7 @@ public class OfflineOPT extends OfflineAlgorithm {
             for(int v = 0; v < M; ++v) {
                 addEdge(N+v, t, 1, 0);
                 for(src.graph.Vertex u : g.getOnlineVertex(v).getNeighbors()) {
-                    int weight = u.getEdge(g.getOnlineVertex(N+v)).getWeight();
+                    int weight = u.getEdge(g.getOnlineVertex(v)).getWeight();
                     addEdge(u.getId(), N+v, 1, weight);
                 }
             }
