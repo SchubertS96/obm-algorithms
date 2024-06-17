@@ -31,11 +31,10 @@ public class OfflineOPT extends OfflineAlgorithm {
                 ResidualGraph.Edge e = parent[cur];
                 e.flow += possibleFlow;
                 e.reverse.flow -= possibleFlow;
-                res.cost += possibleFlow*e.cost;
+                //res.cost += possibleFlow*e.cost;
                 cur = e.from;
             } while (cur != node);
         }
-        System.out.println("Cost is: "+res.cost);
         return constructMatching(g, res);
     }
 
@@ -81,8 +80,7 @@ public class OfflineOPT extends OfflineAlgorithm {
 
         Vertex[] vertices;
         List<Edge> edges; 
-        //int flow; 
-        int cost; 
+        //int flow, cost 
         int s, t; 
         int[] levels; 
 
@@ -91,8 +89,8 @@ public class OfflineOPT extends OfflineAlgorithm {
             edges = new ArrayList<>();
             for(int i = 0; i < V; ++i) vertices[i] = new Vertex();
             levels = new int[V];
-            //flow = 0; 
-            cost = 0; s = V-2; t = V-1;
+            //flow = 0; cost = 0; 
+            s = V-2; t = V-1;
         }
 
         /**
@@ -160,7 +158,7 @@ public class OfflineOPT extends OfflineAlgorithm {
                     if(addFlow > 0) {
                         e.flow += addFlow;
                         e.reverse.flow -= addFlow;
-                        cost += addFlow*e.cost;
+                        //cost += addFlow*e.cost;
                         return addFlow;
                     }
                 }

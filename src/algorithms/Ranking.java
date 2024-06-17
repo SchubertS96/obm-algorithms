@@ -15,7 +15,7 @@ public class Ranking extends OnlineAlgorithm {
         int[] loads = new int[n];
         for(int onId : arrivalOrder) {
             Vertex on = g.getOnlineVertex(onId);
-            Set<Vertex> availableNeighbors = getAvailableNeighbors(on, loads, g);
+            List<Vertex> availableNeighbors = getAvailableNeighbors(on, loads, g);
             if(!availableNeighbors.isEmpty()) {
                 Vertex partner = chooseVertex(on, availableNeighbors, ranks);
                 match(partner, on, loads, m);
@@ -24,7 +24,7 @@ public class Ranking extends OnlineAlgorithm {
         return m; 
     }
 
-    private Vertex chooseVertex(Vertex on, Set<Vertex> availableNeighbors, double[] ranks) {
+    private Vertex chooseVertex(Vertex on, List<Vertex> availableNeighbors, double[] ranks) {
         double max = 0; 
         Vertex partner = null; 
         for(Vertex off : availableNeighbors) {

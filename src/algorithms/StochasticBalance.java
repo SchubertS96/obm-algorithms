@@ -1,6 +1,6 @@
 package src.algorithms;
 
-import java.util.Set;
+import java.util.List;
 import src.graph.*;
 
 /**
@@ -16,7 +16,7 @@ public class StochasticBalance extends OnlineAlgorithm {
         double[] stochLoads = new double[n];
         for(int onId : arrivalOrder) {
             Vertex on = g.getOnlineVertex(onId);
-            Set<Vertex> availableNeighbors = getAvailableNeighbors(on, loads, g);
+            List<Vertex> availableNeighbors = getAvailableNeighbors(on, loads, g);
             if(!availableNeighbors.isEmpty()) {
                 Vertex partner = chooseVertex(on, availableNeighbors, stochLoads, g);
                 stochLoads[partner.getId()] += partner.getEdge(on).getProbability();
@@ -26,7 +26,7 @@ public class StochasticBalance extends OnlineAlgorithm {
         return m; 
     }
 
-    private Vertex chooseVertex(Vertex on, Set<Vertex> availableNeighbors, double[] stochLoads, BipartiteGraph g) {
+    private Vertex chooseVertex(Vertex on, List<Vertex> availableNeighbors, double[] stochLoads, BipartiteGraph g) {
         double max = 0; 
         Vertex partner = null; 
         for(Vertex off : availableNeighbors) {

@@ -26,7 +26,7 @@ public class Matching {
         return size; 
     }
 
-    public double getWeight() {
+    public int getWeight() {
         return weight; 
     }
 

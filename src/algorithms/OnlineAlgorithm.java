@@ -1,8 +1,6 @@
 package src.algorithms;
 
-import java.util.Iterator;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import src.graph.*;
 
 public abstract class OnlineAlgorithm {
@@ -42,8 +40,8 @@ public abstract class OnlineAlgorithm {
      */
     public abstract Matching executeAlgorithm(BipartiteGraph g, int[] arrivalOrder);
 
-    Set<Vertex> getAvailableNeighbors(Vertex on, int[] loads, BipartiteGraph g) {
-        Set<Vertex> neighbors = on.getNeighbors();
+    List<Vertex> getAvailableNeighbors(Vertex on, int[] loads, BipartiteGraph g) {
+        List<Vertex> neighbors = new LinkedList<>(on.getNeighbors());
         for (Iterator<Vertex> i = neighbors.iterator(); i.hasNext();) {
             Vertex off = i.next();
             int offId = off.getId();
