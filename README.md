@@ -1,6 +1,6 @@
 # (Generalized) Online Bipartite Matching
 
-This repository contains a Java implementation of the online algorithms analyzed in my research papers [1](https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.APPROX/RANDOM.2021.2)[yet to publish] and an optimal offline algorithm as a benchmark. 
+This repository contains a Java implementation of the online algorithms analyzed in my research papers [[1](https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.APPROX/RANDOM.2021.2)][yet to publish] and an optimal offline algorithm as a benchmark. 
 
 # Problem Statement
 
